@@ -1,0 +1,4 @@
+xcap-cli/target/debug
+xcap-cli/target/release/.fingerprint
+xcap-cli/target/rust-analyzer/flycheck0
+xcap-cli/target/*
