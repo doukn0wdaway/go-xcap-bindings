@@ -1,17 +1,7 @@
-use serde::Serialize;
+use screenshots::Screen;
+use screenshots::display_info::DisplayInfo;
 use std::env;
 use std::path::Path;
-
-#[derive(Serialize)]
-struct MonitorInfo {
-    id: u32,
-    name: String,
-    width: u32,
-    height: u32,
-    frequency: f32,
-    is_primary: bool,
-    scale_factor: f32,
-}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = env::args();
@@ -29,23 +19,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match command.as_str() {
         "get-monitors" => {
-            let monitors = xcap::Monitor::all()?;
-            let result: Vec<MonitorInfo> = monitors
-                .into_iter()
-                .map(|m| -> Result<MonitorInfo, xcap::XCapError> {
-                    Ok(MonitorInfo {
-                        id: m.id()?,
-                        name: m.name()?,
-                        width: m.width()?,
-                        height: m.height()?,
-                        frequency: m.frequency()?,
-                        is_primary: m.is_primary()?,
-                        scale_factor: m.scale_factor()?,
-                    })
-                })
-                .collect::<Result<_, _>>()?;
+            let monitors = Screen::all()?;
+            let result: Vec<DisplayInfo> = monitors.iter().map(|m| m.display_info).collect();
 
-            println!("{}", serde_json::to_string_pretty(&result)?);
+            println!("{:#?}", result);
         }
 
         "screenshot" => {
@@ -56,20 +33,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .map_err(|_| "monitorId must be a number")?;
             let output = args.next().unwrap_or_else(|| "screenshot.png".to_string());
 
-            let monitors = xcap::Monitor::all()?;
+            let monitors = Screen::all()?;
             let monitor = monitors
                 .into_iter()
-                .find(|m| m.id().unwrap_or(u32::MAX) == monitor_id)
+                .find(|m| m.display_info.id == monitor_id)
                 .ok_or(format!("Monitor with id {} not found", monitor_id))?;
 
-            let image = monitor.capture_region(1600, 0, 500, 500)?;
+            let image = monitor.capture()?;
             image.save(Path::new(&output))?;
-            println!(
-                "Monitor width: {}, height: {}",
-                monitor.width()?,
-                monitor.height()?
-            );
-            println!("Image width: {}, height: {}", image.width(), image.height());
             println!("Screenshot saved to {}", output);
         }
 
