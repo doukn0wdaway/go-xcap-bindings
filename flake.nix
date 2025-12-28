@@ -30,7 +30,6 @@
             pkgs.clang
 
             pkgs.libxcb
-            # pkgs.pkgsCross.musl64.cargo
           ];
 
 
