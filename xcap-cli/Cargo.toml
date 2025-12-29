@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 screenshots = "0.8.10"
+serde_json = "1.0.148"

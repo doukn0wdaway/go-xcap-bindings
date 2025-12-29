@@ -1,11 +1,22 @@
 use screenshots::Screen;
 use screenshots::display_info::DisplayInfo;
+use serde_json::{Value, json};
 use std::env;
 use std::path::Path;
 
+fn display_info2json(d: DisplayInfo) -> Value {
+    json!({
+        "id": d.id,
+        "width": d.width,
+        "height": d.height,
+        "is_primary": d.is_primary,
+        "scale_factor": d.scale_factor
+    })
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = env::args();
-    let _program = args.next(); // пропускаем имя программы
+    let _program = args.next();
 
     let command = match args.next() {
         Some(cmd) => cmd,
@@ -20,9 +31,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     match command.as_str() {
         "get-monitors" => {
             let monitors = Screen::all()?;
-            let result: Vec<DisplayInfo> = monitors.iter().map(|m| m.display_info).collect();
+            let result: Vec<Value> = monitors
+                .iter()
+                .map(|m| display_info2json(m.display_info))
+                .collect();
 
-            println!("{:#?}", result);
+            println!("{}", json!(result).to_string());
         }
 
         "screenshot" => {

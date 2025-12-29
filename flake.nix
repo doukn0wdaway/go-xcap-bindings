@@ -24,6 +24,7 @@
             pkgs.wayland
 
             pkgs.mesa
+            pkgs.go
             pkgs.libgbm
             pkgs.pipewire
             pkgs.libGL
@@ -33,9 +34,9 @@
           ];
 
 
+          # export LIBCLANG_PATH=${pkgs.llvmPackages_20.libclang.lib}/lib
           shellHook = ''
             export CC=clang
-            export LIBCLANG_PATH=${pkgs.llvmPackages_20.libclang.lib}/lib
             export CXX=clang++
           '';
         };
