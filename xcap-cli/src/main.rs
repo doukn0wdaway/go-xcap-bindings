@@ -13,18 +13,7 @@ struct MonitorInfo {
     is_primary: bool,
     scale_factor: f32,
 }
-
-#[cfg(windows)]
-fn stdout_binary() {
-    unsafe {
-        libc::setmode(libc::STDOUT_FILENO, libc::O_BINARY);
-    }
-}
-
 fn dump_rgba(img: &image::ImageBuffer<image::Rgba<u8>, Vec<u8>>) {
-    #[cfg(windows)]
-    stdout_binary();
-
     let mut out = io::stdout().lock();
 
     out.write_all(&img.width().to_le_bytes()).unwrap();

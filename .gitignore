@@ -1,1 +1,2 @@
 xcap-cli/target/*
+target/rust-analyzer/flycheck0
