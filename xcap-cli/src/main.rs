@@ -1,6 +1,7 @@
 use serde::Serialize;
-use std::env;
-use std::path::Path;
+use std::io::Write;
+use std::{env, io};
+use xcap::image;
 
 #[derive(Serialize)]
 struct MonitorInfo {
@@ -13,6 +14,25 @@ struct MonitorInfo {
     scale_factor: f32,
 }
 
+#[cfg(windows)]
+fn stdout_binary() {
+    unsafe {
+        libc::setmode(libc::STDOUT_FILENO, libc::O_BINARY);
+    }
+}
+
+fn dump_rgba(img: &image::ImageBuffer<image::Rgba<u8>, Vec<u8>>) {
+    #[cfg(windows)]
+    stdout_binary();
+
+    let mut out = io::stdout().lock();
+
+    out.write_all(&img.width().to_le_bytes()).unwrap();
+    out.write_all(&img.height().to_le_bytes()).unwrap();
+    out.write_all(img.as_raw()).unwrap();
+    out.flush().unwrap();
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = env::args();
     let _program = args.next(); // пропускаем имя программы
@@ -22,7 +42,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         None => {
             eprintln!("Usage:");
             eprintln!("  get-monitors");
-            eprintln!("  screenshot <monitorId> [output.png]");
+            eprintln!("  screenshot <monitorId>");
             std::process::exit(1);
         }
     };
@@ -54,7 +74,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .ok_or("Missing monitorId")?
                 .parse()
                 .map_err(|_| "monitorId must be a number")?;
-            let output = args.next().unwrap_or_else(|| "screenshot.png".to_string());
 
             let monitors = xcap::Monitor::all()?;
             let monitor = monitors
@@ -63,14 +82,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .ok_or(format!("Monitor with id {} not found", monitor_id))?;
 
             let image = monitor.capture_image()?;
-            image.save(Path::new(&output))?;
-            println!(
-                "Monitor width: {}, height: {}",
-                monitor.width()?,
-                monitor.height()?
-            );
-            println!("Image width: {}, height: {}", image.width(), image.height());
-            println!("Screenshot saved to {}", output);
+            dump_rgba(&image);
         }
 
         _ => {

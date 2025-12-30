@@ -15,7 +15,7 @@ func main() {
 	fmt.Println("Monitors:")
 	fmt.Println(out)
 
-	ss, err := xcap.GetScreenshot(35)
+	ss, err := xcap.GetScreenshot(33)
 	if err != nil {
 		panic(err)
 	}

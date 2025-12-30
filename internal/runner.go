@@ -3,7 +3,6 @@ package internal
 import (
 	"os"
 	"path/filepath"
-	"runtime"
 	"sync"
 )
 
@@ -25,20 +24,10 @@ func ExtractBinary() (string, error) {
 		dir = filepath.Join(dir, "xcap")
 		_ = os.MkdirAll(dir, 0o755)
 
-		data, name := EmbeddedBinary()
+		data, name := embeddedBinary() // TODO: ADD CACHING
 		path := filepath.Join(dir, name)
 
-		if _, e := os.Stat(path); e == nil {
-			extractedPath = path
-			return
-		}
-
-		mode := os.FileMode(0o755)
-		if runtime.GOOS == "windows" {
-			mode = 0o666
-		}
-
-		e = os.WriteFile(path, data, mode)
+		e = os.WriteFile(path, data, binaryFileMode())
 		if e != nil {
 			err = e
 			return
