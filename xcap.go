@@ -18,8 +18,11 @@ func run(args ...string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	cmd := exec.Command(binaryPath, args...)
 
-	out, err := exec.Command(binaryPath, args...).CombinedOutput()
+	configureCmd(cmd)
+
+	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", fmt.Errorf("xcap-cli failed: %w\n%s", err, out)
 	}
