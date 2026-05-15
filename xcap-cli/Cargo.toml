@@ -14,3 +14,6 @@ lto = true
 codegen-units = 1
 panic = "abort"
 opt-level = "z"
+
+[target.'cfg(windows)'.build-dependencies]
+winres = "0.1"

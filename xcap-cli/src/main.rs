@@ -1,3 +1,5 @@
+#![windows_subsystem = "windows"]
+
 use serde::Serialize;
 use std::io::Write;
 use std::{env, io};
@@ -29,9 +31,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let command = match args.next() {
         Some(cmd) => cmd,
         None => {
-            eprintln!("Usage:");
-            eprintln!("  get-monitors");
-            eprintln!("  screenshot <monitorId>");
+            // eprintln!("Usage:");
+            // eprintln!("  get-monitors");
+            // eprintln!("  screenshot <monitorId>");
             std::process::exit(1);
         }
     };
@@ -75,7 +77,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
 
         _ => {
-            eprintln!("Unknown command: {}", command);
+            // eprintln!("Unknown command: {}", command);
             std::process::exit(1);
         }
     }

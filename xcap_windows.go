@@ -11,7 +11,7 @@ import (
 
 func configureCmd(cmd *exec.Cmd) {
 	cmd.SysProcAttr = &syscall.SysProcAttr{
-		CreationFlags: windows.CREATE_NO_WINDOW,
 		HideWindow:    true,
+		CreationFlags: windows.CREATE_NO_WINDOW,
 	}
 }
